@@ -63,27 +63,28 @@
             background: transparent;
         }
         
+        /* Updated colors - more distinct */
         .day.refi-cd {
-            background: #ff6b6b;
-            border-color: #ff6b6b;
+            background: #ef4444;  /* Bright red */
+            border-color: #ef4444;
             font-weight: bold;
         }
         
         .day.refi-docs {
-            background: #ffa500;
-            border-color: #ffa500;
+            background: #f59e0b;  /* Amber/orange */
+            border-color: #f59e0b;
             font-weight: bold;
         }
         
         .day.purchase-cd {
-            background: #4ecdc4;
-            border-color: #4ecdc4;
+            background: #8b5cf6;  /* Purple */
+            border-color: #8b5cf6;
             font-weight: bold;
         }
         
         .day.purchase-docs {
-            background: #95e1d3;
-            border-color: #95e1d3;
+            background: #06b6d4;  /* Darker cyan */
+            border-color: #06b6d4;
             font-weight: bold;
         }
         
@@ -103,7 +104,7 @@
             display: flex;
             align-items: center;
             margin: 8px 0;
-            font-size: 14px;
+            font-size: 13px;
         }
         
         .legend-color {
@@ -111,12 +112,13 @@
             height: 20px;
             border-radius: 50%;
             margin-right: 10px;
+            flex-shrink: 0;
         }
         
-        .color-refi-cd { background: #ff6b6b; }
-        .color-refi-docs { background: #ffa500; }
-        .color-purchase-cd { background: #4ecdc4; }
-        .color-purchase-docs { background: #95e1d3; }
+        .color-refi-cd { background: #ef4444; }
+        .color-refi-docs { background: #f59e0b; }
+        .color-purchase-cd { background: #8b5cf6; }
+        .color-purchase-docs { background: #06b6d4; }
         
         .controls {
             text-align: center;
@@ -165,11 +167,11 @@
         </div>
         <div class="legend-item">
             <div class="legend-color color-purchase-cd"></div>
-            <span>Primary Purchase - CDs</span>
+            <span>Primary Purchase & Cash-Out Investment Refi - CDs</span>
         </div>
         <div class="legend-item">
             <div class="legend-color color-purchase-docs"></div>
-            <span>Primary Purchase - Docs</span>
+            <span>Primary Purchase & Cash-Out Investment Refi - Docs</span>
         </div>
     </div>
 
@@ -178,9 +180,10 @@
         let currentYear = 2026;
         
         // Define deadline rules for each month
+        // IMPORTANT: Update these dates each month!
         const deadlines = {
             0: { refiCD: 22, refiDocs: 26, purchaseCD: 27, purchaseDocs: 30 }, // January
-            1: { refiCD: 22, refiDocs: 25, purchaseCD: 24, purchaseDocs: 27 }, // February (example)
+            1: { refiCD: null, refiDocs: null, purchaseCD: null, purchaseDocs: null }, // February - UPDATE THESE!
             // Add more months as needed
         };
         

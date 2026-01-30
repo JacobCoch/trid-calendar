@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TRID Month-End Calendar</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 500px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #1e1e1e;
+            color: #e0e0e0;
+        }
+        
+        .calendar-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .calendar-header h2 {
+            margin: 0;
+            color: #4a9eff;
+        }
+        
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .day-label {
+            text-align: center;
+            font-weight: bold;
+            padding: 8px;
+            color: #888;
+            font-size: 12px;
+        }
+        
+        .day {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 14px;
+            border: 2px solid transparent;
+        }
+        
+        .day:hover {
+            background: #2a2a2a;
+        }
+        
+        .day.empty {
+            cursor: default;
+        }
+        
+        .day.empty:hover {
+            background: transparent;
+        }
+        
+        .day.refi-cd {
+            background: #ff6b6b;
+            border-color: #ff6b6b;
+            font-weight: bold;
+        }
+        
+        .day.refi-docs {
+            background: #ffa500;
+            border-color: #ffa500;
+            font-weight: bold;
+        }
+        
+        .day.purchase-cd {
+            background: #4ecdc4;
+            border-color: #4ecdc4;
+            font-weight: bold;
+        }
+        
+        .day.purchase-docs {
+            background: #95e1d3;
+            border-color: #95e1d3;
+            font-weight: bold;
+        }
+        
+        .legend {
+            background: #2a2a2a;
+            padding: 15px;
+            border-radius: 8px;
+        }
+        
+        .legend h3 {
+            margin-top: 0;
+            color: #4a9eff;
+            font-size: 16px;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin: 8px 0;
+            font-size: 14px;
+        }
+        
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+        
+        .color-refi-cd { background: #ff6b6b; }
+        .color-refi-docs { background: #ffa500; }
+        .color-purchase-cd { background: #4ecdc4; }
+        .color-purchase-docs { background: #95e1d3; }
+        
+        .controls {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+        
+        .controls button {
+            background: #4a9eff;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 0 5px;
+            font-size: 14px;
+        }
+        
+        .controls button:hover {
+            background: #3a8eef;
+        }
+    </style>
+</head>
+<body>
+    <div class="calendar-header">
+        <h2 id="month-year">January 2026</h2>
+    </div>
+    
+    <div class="controls">
+        <button onclick="previousMonth()">← Previous</button>
+        <button onclick="nextMonth()">Next →</button>
+    </div>
+    
+    <div class="calendar-grid" id="calendar">
+        <!-- Calendar will be generated here -->
+    </div>
+    
+    <div class="legend">
+        <h3>📅 Month-End Deadlines</h3>
+        <div class="legend-item">
+            <div class="legend-color color-refi-cd"></div>
+            <span>Primary Refi - CDs</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color color-refi-docs"></div>
+            <span>Primary Refi - Docs</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color color-purchase-cd"></div>
+            <span>Primary Purchase - CDs</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color color-purchase-docs"></div>
+            <span>Primary Purchase - Docs</span>
+        </div>
+    </div>
+
+    <script>
+        let currentMonth = 0; // January
+        let currentYear = 2026;
+        
+        // Define deadline rules for each month
+        const deadlines = {
+            0: { refiCD: 22, refiDocs: 26, purchaseCD: 27, purchaseDocs: 30 }, // January
+            1: { refiCD: 22, refiDocs: 25, purchaseCD: 24, purchaseDocs: 27 }, // February (example)
+            // Add more months as needed
+        };
+        
+        function generateCalendar(month, year) {
+            const calendar = document.getElementById('calendar');
+            const monthYear = document.getElementById('month-year');
+            
+            const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+                              'July', 'August', 'September', 'October', 'November', 'December'];
+            
+            monthYear.textContent = `${monthNames[month]} ${year}`;
+            
+            // Clear existing calendar
+            calendar.innerHTML = '';
+            
+            // Add day labels
+            const dayLabels = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
+            dayLabels.forEach(label => {
+                const dayLabel = document.createElement('div');
+                dayLabel.className = 'day-label';
+                dayLabel.textContent = label;
+                calendar.appendChild(dayLabel);
+            });
+            
+            // Get first day of month and number of days
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            
+            // Get deadlines for this month
+            const monthDeadlines = deadlines[month] || {};
+            
+            // Add empty cells for days before month starts
+            for (let i = 0; i < firstDay; i++) {
+                const emptyDay = document.createElement('div');
+                emptyDay.className = 'day empty';
+                calendar.appendChild(emptyDay);
+            }
+            
+            // Add days of the month
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dayCell = document.createElement('div');
+                dayCell.className = 'day';
+                dayCell.textContent = day;
+                
+                // Check if this day is a deadline
+                if (day === monthDeadlines.refiCD) {
+                    dayCell.classList.add('refi-cd');
+                } else if (day === monthDeadlines.refiDocs) {
+                    dayCell.classList.add('refi-docs');
+                } else if (day === monthDeadlines.purchaseCD) {
+                    dayCell.classList.add('purchase-cd');
+                } else if (day === monthDeadlines.purchaseDocs) {
+                    dayCell.classList.add('purchase-docs');
+                }
+                
+                calendar.appendChild(dayCell);
+            }
+        }
+        
+        function previousMonth() {
+            currentMonth--;
+            if (currentMonth < 0) {
+                currentMonth = 11;
+                currentYear--;
+            }
+            generateCalendar(currentMonth, currentYear);
+        }
+        
+        function nextMonth() {
+            currentMonth++;
+            if (currentMonth > 11) {
+                currentMonth = 0;
+                currentYear++;
+            }
+            generateCalendar(currentMonth, currentYear);
+        }
+        
+        // Initialize calendar
+        generateCalendar(currentMonth, currentYear);
+    </script>
+</body>
+</html>

@@ -87,7 +87,12 @@
             border-color: #06b6d4;
             font-weight: bold;
         }
-        
+
+        .day.today {
+            border: 3px solid #10b981;  /* Green border for today */
+            box-shadow: 0 0 8px rgba(16, 185, 129, 0.5);
+        }
+
         .legend {
             background: #2a2a2a;
             padding: 15px;
@@ -119,7 +124,12 @@
         .color-refi-docs { background: #f59e0b; }
         .color-purchase-cd { background: #8b5cf6; }
         .color-purchase-docs { background: #06b6d4; }
-        
+        .color-today {
+            background: transparent;
+            border: 3px solid #10b981;
+            box-sizing: border-box;
+        }
+
         .controls {
             text-align: center;
             margin-bottom: 15px;
@@ -157,6 +167,10 @@
     
     <div class="legend">
         <h3>📅 Month-End Deadlines</h3>
+        <div class="legend-item">
+            <div class="legend-color color-today"></div>
+            <span>Today</span>
+        </div>
         <div class="legend-item">
             <div class="legend-color color-refi-cd"></div>
             <span>Primary Refi - CDs</span>
@@ -214,7 +228,12 @@
             
             // Get deadlines for this month
             const monthDeadlines = deadlines[month] || {};
-            
+
+            // Get today's date
+            const today = new Date();
+            const isCurrentMonth = (today.getMonth() === month && today.getFullYear() === year);
+            const todayDate = today.getDate();
+
             // Add empty cells for days before month starts
             for (let i = 0; i < firstDay; i++) {
                 const emptyDay = document.createElement('div');
@@ -227,7 +246,12 @@
                 const dayCell = document.createElement('div');
                 dayCell.className = 'day';
                 dayCell.textContent = day;
-                
+
+                // Check if this day is today
+                if (isCurrentMonth && day === todayDate) {
+                    dayCell.classList.add('today');
+                }
+
                 // Check if this day is a deadline
                 if (day === monthDeadlines.refiCD) {
                     dayCell.classList.add('refi-cd');
@@ -238,7 +262,7 @@
                 } else if (day === monthDeadlines.purchaseDocs) {
                     dayCell.classList.add('purchase-docs');
                 }
-                
+
                 calendar.appendChild(dayCell);
             }
         }
